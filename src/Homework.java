@@ -52,10 +52,7 @@ public class Homework extends SuperKarel {
     private void zigZagX(){
         placeBeeper();
         int alternate = 0;
-        boolean direction = false;
-        if(width%2 != 0){
-            direction = true;
-        }
+        boolean direction = width % 2 != 0;
         while(!cornerColorIs(GREEN)){
             if(direction){
                 turnRight();
