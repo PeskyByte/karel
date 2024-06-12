@@ -16,7 +16,6 @@ public class Homework extends SuperKarel {
     private void moveKarel() {
         move();
         moves++;
-
         if (facingNorth()) currentY++;
         else if (facingSouth()) currentY--;
         else if (facingEast()) currentX++;
@@ -52,67 +51,64 @@ public class Homework extends SuperKarel {
     }
 
     private void moveToEdge(boolean placeBeepers) {
-        if(placeBeepers) placeBeeper();
+        if (placeBeepers) placeBeeper();
         while (frontIsClear()) {
             moveKarel();
-            if(placeBeepers) placeBeeper();
+            if (placeBeepers) placeBeeper();
         }
     }
 
-    private void moveToCell(int x, int y) {
+    private void moveToCell(int x, int y, boolean placeBeepers) {
+        if (x > width || x < 1 || y > length || y < 1) return;
         if (currentX < x) turnEast();
         else if (currentX > x) turnWest();
-
         while (currentX != x) moveKarel();
-
         if (currentY < y) turnNorth();
         else if (currentY > y) turnSouth();
-
         while (currentY != y) moveKarel();
+        if (placeBeepers) placeBeeper();
     }
 
     private void cross(boolean x_axis, boolean y_axis) {
         if (x_axis) {
             int closerX = 1;
-            if(width - currentX < currentX - 1) closerX = width;
+            if (width - currentX < currentX - 1) closerX = width;
             System.out.println("closer x = " + closerX);
-            moveToCell(closerX, currentY);
-            turnAround();
+            moveToCell(closerX, currentY, false);
+            if (currentX == 1) turnEast();
+            else turnWest();
             moveToEdge(true);
         }
 
         if (y_axis) {
             int closerY = 1;
-            if(length - currentY < currentY - 1) closerY = length;
-            moveToCell(currentX, closerY);
-            turnAround();
+            if (length - currentY < currentY - 1) closerY = length;
+            moveToCell(currentX, closerY, false);
+            if (currentY == 1) turnNorth();
+            else turnSouth();
             moveToEdge(true);
         }
     }
 
-    private void diagonal(boolean left, boolean right) {
-        if(left){
-            moveToCell(1, length);
-            placeBeeper();
-            while(currentX != width && currentY != 1){
-                moveToCell(currentX+1, currentY-1);
-                placeBeeper();
+    private void zigzag(boolean x_axis, boolean y_axis) {
+        if (x_axis) {
+            for (int i = 1; i < width - 1; i += 2) {
+                moveToCell(currentX - 1, currentY - 1, true);
+                moveToCell(currentX - 1, currentY + 1, true);
             }
+            if (frontIsClear()) moveToCell(currentX - 1, currentY - 1, true);
         }
-        if(right){
-            moveToCell(width, length);
-            placeBeeper();
-            while(currentX != 1 && currentY != 1){
-                moveToCell(currentX-1, currentY-1);
-                placeBeeper();
+        if (y_axis) {
+            for (int i = 1; i < length - 1; i += 2) {
+                moveToCell(currentX + 1, currentY - 1, true);
+                moveToCell(currentX - 1, currentY - 1, true);
             }
+            if (frontIsClear()) moveToCell(currentX + 1, currentY - 1, true);
         }
     }
 
-    private void end() {
-        moveToCell(1, 1);
-        System.out.println("Number of moves: " + moves);
-        System.out.println("Used beepers: " + usedBeepers);
+    private void initial() {
+        setBeepersInBag(10000);
         width = 1;
         length = 1;
         usedBeepers = 0;
@@ -121,50 +117,27 @@ public class Homework extends SuperKarel {
 
     //=====================================================================================
 
-    private void zigZagY(boolean x_axis, boolean y_axis) {
-        int alternate = 0;
-        boolean direction = true;
-        while (!cornerColorIs(GREEN)) {
-            if (direction) {
-                turnRight();
-            } else {
-                turnLeft();
-            }
-            moveKarel();
-            alternate++;
-            if (alternate % 2 == 0) {
-                placeBeeper();
-                direction = !direction;
-                alternate = 0;
-            }
-        }
-    }
-
-    private void zigZagX() {
-        placeBeeper();
-        int alternate = 0;
-        boolean direction = width % 2 != 0;
-        while (!cornerColorIs(GREEN)) {
-            if (direction) {
-                turnRight();
-            } else {
-                turnLeft();
-            }
-            moveKarel();
-            alternate++;
-            if (alternate % 2 == 0) {
-                placeBeeper();
-                direction = !direction;
-                alternate = 0;
-            }
-        }
-    }
-
     public void run() {
-        setBeepersInBag(10000);
+        initial();
         measureDimensions();
         System.out.println("Width: " + width + "  Length: " + length);
-        
-        end();
+
+        if (length >= 3 && width >= 3) {
+            moveToCell(width, length / 2 + 1, true);
+            if (length % 2 == 0) zigzag(true, false);
+            else cross(true, false);
+
+            if (width % 2 == 0) {
+                moveToCell(width / 2, length, true);
+                zigzag(false, true);
+            } else {
+                moveToCell(width / 2 + 1, length, true);
+                cross(false, true);
+            }
+        }
+
+        moveToCell(1, 1, false);
+        System.out.println("Number of moves: " + moves);
+        System.out.println("Used beepers: " + usedBeepers);
     }
 }
