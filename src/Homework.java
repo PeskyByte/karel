@@ -115,6 +115,9 @@ public class Homework extends SuperKarel {
         }
     }
 
+    private int distanceToCell(int x, int y){
+        return Math.abs(currentX-x) + Math.abs(currentY-y);
+    }
     private void oneBlock(boolean x_axis, boolean y_axis) {
         if (x_axis && y_axis) return;
 
@@ -136,34 +139,34 @@ public class Homework extends SuperKarel {
                 for (int i = 0; i < remain / 4; i++) {
                     moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
                 }
-                placeBeeper();
+                if(!(axisToWorkWith%4 == 0 && distanceToCell(1,1) == 0))
+                    placeBeeper();
             }
         }
     }
 
     private void twoBlock(boolean x_axis, boolean y_axis) {
         int axisToWorkWith = x_axis ? length : width;
-        if (axisToWorkWith <= 8) {
-            while (x_axis ? currentY != 1 : currentX != 1) {
-                moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
+        if (axisToWorkWith < 8) {
+            for (int i = 0; i < axisToWorkWith - 4; i++) {
                 cross(x_axis, y_axis);
                 moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
             }
+            zigzag(!x_axis, !y_axis);
         } else {
             int close = axisToWorkWith % 4;
             cross(x_axis, y_axis);
-
             for (int i = 0; i < close - 1; i++) {
                 moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
                 cross(x_axis, y_axis);
             }
             int remain = axisToWorkWith - close;
-
             while (x_axis ? currentY != 1 : currentX != 1) {
                 for (int i = 0; i < remain / 4; i++) {
                     moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
                 }
-                cross(x_axis, y_axis);
+                if(!(axisToWorkWith%4 == 0 && distanceToCell(1,1) <= 1))
+                    cross(x_axis, y_axis);
             }
         }
     }
