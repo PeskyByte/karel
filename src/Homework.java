@@ -105,6 +105,32 @@ public class Homework extends SuperKarel {
         }
     }
 
+    private void doubleCross(boolean x_axis, boolean y_axis) {
+        if (x_axis) {
+            int closerX = 1;
+            if (width - currentX < currentX - 1) closerX = width;
+            System.out.println("closer x = " + closerX);
+            moveToCell(closerX, currentY, true);
+            for (int i = 1; i <= width; i++) {
+                if (i % 2 != 0) moveToCell(currentX, currentY + 1, true);
+                else moveToCell(currentX, currentY - 1, true);
+                moveToCell(currentX - 1, currentY, true);
+
+            }
+        }
+
+        if (y_axis) {
+            int closerY = 1;
+            if (length - currentY < currentY - 1) closerY = length;
+            moveToCell(currentX, closerY, false);
+            for (int i = 1; i <= length; i++) {
+                if (i % 2 != 0) moveToCell(currentX + 1, currentY, true);
+                else moveToCell(currentX - 1, currentY, true);
+                moveToCell(currentX, currentY - 1, true);
+            }
+        }
+    }
+
     private void zigzag(boolean x_axis, boolean y_axis, boolean presetCoordinate) {
         if (x_axis) {
             if (presetCoordinate) moveToCell(width, length / 2 + 1, true);
@@ -203,10 +229,9 @@ public class Homework extends SuperKarel {
 
                 }
             } else zigzag(length % 2 == 0, width % 2 == 0, true);
-            // DON'T TOUCH THESES
             if (length % 2 != 0) {
                 if (length == 3 && width % 2 == 0) {
-                    moveToCell(currentX+1, currentY, true);
+                    moveToCell(currentX + 1, currentY, true);
                     cross(false, true);
                 }
                 moveToCell(width, length / 2 + 1, true);
@@ -215,13 +240,12 @@ public class Homework extends SuperKarel {
 
             if (width % 2 != 0) {
                 if (width == 3 && length % 2 == 0) {
-                    moveToCell(currentX, currentY-1, true);
+                    moveToCell(currentX, currentY - 1, true);
                     cross(true, false);
                 }
                 moveToCell(width / 2 + 1, length, true);
                 cross(false, true);
             }
-            // DON'T TOUCH THESE
         }
     }
 
