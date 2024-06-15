@@ -58,19 +58,8 @@ public class Homework extends SuperKarel {
         while (notFacingWest()) turnLeft();
     }
 
-    private void moveToEdge(boolean placeBeepers) {
-        if (placeBeepers) placeBeeper();
-        while (frontIsClear()) {
-            moveKarel();
-            if (placeBeepers) placeBeeper();
-        }
-    }
-
     private void moveToCell(int x, int y, boolean placeBeepers) {
-        if (x > width || x < 1 || y > length || y < 1) {
-            System.out.println("illegal move to " + x + "," + y);
-            return;
-        }
+        if (x > width || x < 1 || y > length || y < 1) return;
         if (currentX < x) turnEast();
         else if (currentX > x) turnWest();
         while (currentX != x) moveKarel();
@@ -84,8 +73,17 @@ public class Homework extends SuperKarel {
         return Math.abs(currentX - x) + Math.abs(currentY - y);
     }
 
-    private void cross(boolean x_axis, boolean y_axis) {
+    private void moveToEdge(boolean placeBeepers) {
+        if (placeBeepers) placeBeeper();
+        while (frontIsClear()) {
+            moveKarel();
+            if (placeBeepers) placeBeeper();
+        }
+    }
+
+    private void cross(boolean x_axis, boolean y_axis, boolean presetCoordinates) {
         if (x_axis) {
+            if (presetCoordinates) moveToCell(width, length / 2 + 1, true);
             int closerX = 1;
             if (width - currentX < currentX - 1) closerX = width;
             System.out.println("closer x = " + closerX);
@@ -94,8 +92,8 @@ public class Homework extends SuperKarel {
             else turnWest();
             moveToEdge(true);
         }
-
         if (y_axis) {
+            if (presetCoordinates) moveToCell(width / 2 + 1, length, true);
             int closerY = 1;
             if (length - currentY < currentY - 1) closerY = length;
             moveToCell(currentX, closerY, false);
@@ -105,24 +103,24 @@ public class Homework extends SuperKarel {
         }
     }
 
-    private void doubleCross(boolean x_axis, boolean y_axis) {
+    private void doubleCross(boolean x_axis, boolean y_axis, boolean presetCoordinates) {
         if (x_axis) {
             int closerX = 1;
             if (width - currentX < currentX - 1) closerX = width;
             System.out.println("closer x = " + closerX);
-            moveToCell(closerX, currentY, true);
+            if (presetCoordinates) moveToCell(width, length / 2, true);
+            else moveToCell(closerX, currentY, true);
             for (int i = 1; i <= width; i++) {
                 if (i % 2 != 0) moveToCell(currentX, currentY + 1, true);
                 else moveToCell(currentX, currentY - 1, true);
                 moveToCell(currentX - 1, currentY, true);
-
             }
         }
-
         if (y_axis) {
             int closerY = 1;
             if (length - currentY < currentY - 1) closerY = length;
-            moveToCell(currentX, closerY, false);
+            if (presetCoordinates) moveToCell(width / 2, length, true);
+            else moveToCell(currentX, closerY, true);
             for (int i = 1; i <= length; i++) {
                 if (i % 2 != 0) moveToCell(currentX + 1, currentY, true);
                 else moveToCell(currentX - 1, currentY, true);
@@ -142,7 +140,6 @@ public class Homework extends SuperKarel {
                 }
             }
         }
-
         if (y_axis) {
             if (presetCoordinate) moveToCell(width / 2, length, true);
             placeBeeper();
@@ -155,7 +152,6 @@ public class Homework extends SuperKarel {
 
     private void oneBlock(boolean x_axis, boolean y_axis) {
         if (x_axis && y_axis) return;
-
         int axisToWorkWith = x_axis ? length : width;
         if (axisToWorkWith <= 8) {
             while (x_axis ? currentY != 1 : currentX != 1) {
@@ -183,23 +179,23 @@ public class Homework extends SuperKarel {
         int axisToWorkWith = x_axis ? length : width;
         if (axisToWorkWith <= 8) {
             for (int i = 0; i < axisToWorkWith - 4; i++) {
-                cross(x_axis, y_axis);
+                cross(x_axis, y_axis, false);
                 moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
             }
             zigzag(!x_axis, !y_axis, false);
         } else {
             int close = axisToWorkWith % 4;
-            cross(x_axis, y_axis);
+            cross(x_axis, y_axis, false);
             for (int i = 0; i < close - 1; i++) {
                 moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
-                cross(x_axis, y_axis);
+                cross(x_axis, y_axis, false);
             }
             int remain = axisToWorkWith - close;
             while (x_axis ? currentY != 1 : currentX != 1) {
                 for (int i = 0; i < remain / 4; i++) {
                     moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
                 }
-                if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1)) cross(x_axis, y_axis);
+                if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1)) cross(x_axis, y_axis, false);
             }
         }
     }
@@ -222,34 +218,26 @@ public class Homework extends SuperKarel {
 
     private void divide() {
         if (length >= 3 && width >= 3) {
-
             if (length % 2 == 0 && width % 2 == 0) {
-                if (length == width) zigzag(true, true, true);
-                else {
-
+                if (length == 4 || width == 4) {
+                    doubleCross(true, true, true);
+                } else {
+                    zigzag(width == length, length == width, true);
+                    zigzag(width < length, length < width, true);
+                    doubleCross(width > length, length > width, true);
                 }
-            } else zigzag(length % 2 == 0, width % 2 == 0, true);
-            if (length % 2 != 0) {
-                if (length == 3 && width % 2 == 0) {
-                    moveToCell(currentX + 1, currentY, true);
-                    cross(false, true);
+            } else {
+                if (length == 4 || width == 4) {
+                    doubleCross(length == 4, width == 4, true);
+                    cross(length != 4, width != 4, true);
+                } else {
+                    cross(length % 2 != 0, width % 2 != 0, true);
+                    doubleCross(length % 2 == 0, width % 2 == 0, true);
                 }
-                moveToCell(width, length / 2 + 1, true);
-                cross(true, false);
-            }
-
-            if (width % 2 != 0) {
-                if (width == 3 && length % 2 == 0) {
-                    moveToCell(currentX, currentY - 1, true);
-                    cross(true, false);
-                }
-                moveToCell(width / 2 + 1, length, true);
-                cross(false, true);
             }
         }
     }
 
-    //=====================================================================================
     public void run() {
         initial();
         measureDimensions();
