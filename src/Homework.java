@@ -1,7 +1,6 @@
 import stanford.karel.SuperKarel;
 
 public class Homework extends SuperKarel {
-
     private int width = 1, length = 1;
     private int usedBeepers = 0, moves = 0;
     private int currentX = 1, currentY = 1;
@@ -153,24 +152,36 @@ public class Homework extends SuperKarel {
     private void oneBlock(boolean x_axis, boolean y_axis) {
         if (x_axis && y_axis) return;
         int axisToWorkWith = x_axis ? length : width;
-        if (axisToWorkWith <= 8) {
+        if (axisToWorkWith <= 6) {
             while (x_axis ? currentY != 1 : currentX != 1) {
                 moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, true);
                 moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
             }
         } else {
             int close = axisToWorkWith % 4;
-            placeBeeper();
-            for (int i = 0; i < close - 1; i++) {
-                moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, true);
-            }
-            int remain = axisToWorkWith - close;
-            System.out.println(remain);
-            while (x_axis ? currentY != 1 : currentX != 1) {
-                for (int i = 0; i < remain / 4; i++) {
+            if (close == 3) {
+                for (int i = 0; i < axisToWorkWith / 4; i++) {
                     moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
                 }
-                if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) == 0)) placeBeeper();
+                while (x_axis ? currentY != 1 : currentX != 1) {
+                    if (!(distanceToCell(1, 1) == 0)) placeBeeper();
+                    for (int i = 0; i < axisToWorkWith / 4 + 1; i++) {
+                        moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
+                    }
+                }
+            } else {
+                placeBeeper();
+                for (int i = 0; i < close - 1; i++) {
+                    moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, true);
+                }
+                int remain = axisToWorkWith - close;
+                System.out.println(remain);
+                while (x_axis ? currentY != 1 : currentX != 1) {
+                    for (int i = 0; i < remain / 4; i++) {
+                        moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
+                    }
+                    if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) == 0)) placeBeeper();
+                }
             }
         }
     }
@@ -185,17 +196,30 @@ public class Homework extends SuperKarel {
             zigzag(!x_axis, !y_axis, false);
         } else {
             int close = axisToWorkWith % 4;
-            cross(x_axis, y_axis, false);
-            for (int i = 0; i < close - 1; i++) {
-                moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
-                cross(x_axis, y_axis, false);
-            }
-            int remain = axisToWorkWith - close;
-            while (x_axis ? currentY != 1 : currentX != 1) {
-                for (int i = 0; i < remain / 4; i++) {
-                    moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
+            if (close == 3) {
+                for (int i = 0; i < axisToWorkWith / 4; i++) {
+                    moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
                 }
-                if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1)) cross(x_axis, y_axis, false);
+                while (x_axis ? currentY != 1 : currentX != 1) {
+                    if (!(distanceToCell(1, 1) <= 1)) cross(x_axis, y_axis, false);
+                    for (int i = 0; i < axisToWorkWith / 4 + 1; i++) {
+                        moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
+                    }
+                }
+            } else {
+                cross(x_axis, y_axis, false);
+                for (int i = 0; i < close - 1; i++) {
+                    moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
+                    cross(x_axis, y_axis, false);
+                }
+                int remain = axisToWorkWith - close;
+                while (x_axis ? currentY != 1 : currentX != 1) {
+                    for (int i = 0; i < remain / 4; i++) {
+                        moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
+                    }
+                    if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1))
+                        cross(x_axis, y_axis, false);
+                }
             }
         }
     }
