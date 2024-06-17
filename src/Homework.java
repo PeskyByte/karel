@@ -85,7 +85,6 @@ public class Homework extends SuperKarel {
             if (presetCoordinates) moveToCell(width, length / 2 + 1, true);
             int closerX = 1;
             if (width - currentX < currentX - 1) closerX = width;
-            System.out.println("closer x = " + closerX);
             moveToCell(closerX, currentY, false);
             if (currentX == 1) turnEast();
             else turnWest();
@@ -106,7 +105,6 @@ public class Homework extends SuperKarel {
         if (x_axis) {
             int closerX = 1;
             if (width - currentX < currentX - 1) closerX = width;
-            System.out.println("closer x = " + closerX);
             if (presetCoordinates) moveToCell(width, length / 2, true);
             else moveToCell(closerX, currentY, true);
             for (int i = 1; i <= width; i++) {
@@ -175,7 +173,6 @@ public class Homework extends SuperKarel {
                     moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, true);
                 }
                 int remain = axisToWorkWith - close;
-                System.out.println(remain);
                 while (x_axis ? currentY != 1 : currentX != 1) {
                     for (int i = 0; i < remain / 4; i++) {
                         moveToCell(x_axis ? 1 : currentX - 1, x_axis ? currentY - 1 : 1, false);
@@ -217,8 +214,7 @@ public class Homework extends SuperKarel {
                     for (int i = 0; i < remain / 4; i++) {
                         moveToCell(x_axis ? currentX : currentX - 1, x_axis ? currentY - 1 : currentY, false);
                     }
-                    if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1))
-                        cross(x_axis, y_axis, false);
+                    if (!(axisToWorkWith % 4 == 0 && distanceToCell(1, 1) <= 1)) cross(x_axis, y_axis, false);
                 }
             }
         }
